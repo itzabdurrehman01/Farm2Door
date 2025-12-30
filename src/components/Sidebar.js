@@ -8,7 +8,7 @@ function Sidebar() {
   const LinkItem = ({ to, icon, label }) => (
     <NavLink
       to={to}
-      className={({ isActive }) => `sidebar-link d-flex align-center gap-sm ${isActive ? 'active' : ''}`}
+      className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
     >
       {icon}
       <span>{label}</span>

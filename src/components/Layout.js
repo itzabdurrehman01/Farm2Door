@@ -26,28 +26,17 @@ function Layout() {
     <div className="app-layout">
       <NavBar onToggle={() => setSidebarOpen(v => !v)} />
 
-      <div className="main-wrapper" style={{
-        display: 'flex',
-        minHeight: 'calc(100vh - 60px)'
-      }}>
+      <div className="main-wrapper">
         {showSidebar && (
-          <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`} style={{
-            width: sidebarOpen ? '260px' : '0',
-            overflow: 'hidden',
-            transition: 'width 0.3s ease',
-            borderRight: '1px solid var(--border-color)',
-            background: 'var(--bg-secondary)'
-          }}>
+          <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
             <Sidebar />
           </aside>
         )}
 
-        <main className="content" style={{
-          flex: 1,
-          padding: 'var(--spacing-md)',
-          backgroundColor: 'var(--bg-primary)'
-        }}>
-          <Outlet />
+        <main className="content">
+          <div className="content-inner">
+            <Outlet />
+          </div>
         </main>
       </div>
 

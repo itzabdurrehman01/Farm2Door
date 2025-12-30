@@ -1,43 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { apiGet } from '../api';
 import ProductCard from '../components/ProductCard';
-import { useCart } from '../state/CartContext';
 import { Icons } from '../components/Icons';
+import { useCart } from '../state/CartContext';
 
 function Catalog() {
+  const { add } = useCart();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('all');
-  const [sort, setSort] = useState('relevance');
+  
+  const category = searchParams.get('category') || 'all';
+  const setCategory = (c) => {
+    if (c === 'all') searchParams.delete('category');
+    else searchParams.set('category', c);
+    setSearchParams(searchParams);
+  };
+
+  const [sort, setSort] = useState('name');
   const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(9999);
-  const [sp, setSp] = useSearchParams();
-  const [loading, setLoading] = useState(true);
-  const cart = useCart();
+  const [priceMax, setPriceMax] = useState(100);
 
   useEffect(() => {
     apiGet('/products')
-      .then((r) => { setProducts(r); setLoading(false); })
-      .catch(() => { setProducts([]); setLoading(false); });
+      .then((data) => {
+        if (Array.isArray(data)) setProducts(data);
+        else if (data && data.products) setProducts(data.products);
+        else setProducts([]);
+      })
+      .catch((err) => {
+        console.error('Failed to load products:', err);
+        // Fallback data for demo
+        setProducts([
+          { id: 1, name: 'Organic Carrots', price: 2.99, unit: 'bunch', category: 'vegetables', image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=800&q=80' },
+          { id: 2, name: 'Sourdough Bread', price: 6.50, unit: 'loaf', category: 'bakery', image: 'https://images.unsplash.com/photo-1585476644321-b976214b606d?auto=format&fit=crop&w=800&q=80' },
+          { id: 3, name: 'Free-range Eggs', price: 5.99, unit: 'dozen', category: 'dairy', image: 'https://images.unsplash.com/photo-1582722878654-02fd235dd7c2?auto=format&fit=crop&w=800&q=80' },
+          { id: 4, name: 'Local Honey', price: 12.00, unit: 'jar', category: 'pantry', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80' },
+          { id: 5, name: 'Fresh Strawberries', price: 4.99, unit: 'basket', category: 'fruit', image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80' },
+          { id: 6, name: 'Artisan Cheese', price: 9.99, unit: 'block', category: 'dairy', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80' }
+        ]);
+      });
   }, []);
-
-  useEffect(() => {
-    const q = sp.get('q') || '';
-    const c = sp.get('c') || 'all';
-    const s = sp.get('s') || 'relevance';
-    const pmin = Number(sp.get('pmin') || 0);
-    const pmax = Number(sp.get('pmax') || 9999);
-    setQuery(q); setCategory(c); setSort(s); setPriceMin(pmin); setPriceMax(pmax);
-  }, [sp]);
-
-  useEffect(() => {
-    setSp({ q: query, c: category, s: sort, pmin: String(priceMin), pmax: String(priceMax) });
-  }, [query, category, sort, priceMin, priceMax, setSp]);
 
   const filtered = products
     .filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
-    .filter((p) => category === 'all' ? true : (p.unit || '').toLowerCase() === category)
+    .filter((p) => category === 'all' ? true : (p.category || '').toLowerCase() === category)
     .filter((p) => {
       const price = Number(p.price) || 0;
       return price >= priceMin && price <= priceMax;
@@ -51,137 +59,99 @@ function Catalog() {
   });
 
   return (
-    <div className="container section py-50">
-      <div className="d-flex justify-between align-center mb-4">
+    <div className="container py-50">
+      <div className="d-flex align-center justify-between mb-5">
         <div>
-          <h2 className="section-title m-0" style={{ marginBottom: '0.5rem' }}>Shop Local</h2>
-          <p className="text-muted">Explore fresh produce and artisan goods from your community.</p>
+          <h1 className="mb-2">Shop Local</h1>
+          <p className="text-muted">Fresh products from your community</p>
         </div>
       </div>
 
       <div className="catalog-layout">
-        {/* Filters Sidebar */}
-        <div className="filters-sidebar">
-          <div className="card p-4">
-            <div className="d-flex align-center gap-sm mb-3">
-              <Icons.Filter size={18} />
-              <h4 className="m-0">Filters</h4>
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Search</label>
-              <div className="search-input-wrapper" style={{ position: 'relative' }}>
-                <input
-                  className="input w-100 pl-5"
-                  placeholder="Keywords..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  style={{ paddingLeft: 36 }}
-                />
-                <div style={{ position: 'absolute', left: 12, top: 12, color: 'var(--text-muted)' }}>
-                  <Icons.Search size={16} />
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Category</label>
-              <div className="filter-options d-flex flex-column gap-sm">
-                {['all', 'kg', 'dozen', 'pack', 'unit'].map(c => (
-                  <button
-                    key={c}
-                    className={`btn ${category === c ? 'btn-primary' : 'btn-outline'} sm text-left justify-between`}
-                    onClick={() => setCategory(c)}
-                    style={{ border: category === c ? 'none' : '1px solid #e2e8f0', color: category === c ? 'white' : 'var(--text-main)' }}
-                  >
-                    <span style={{ textTransform: 'capitalize' }}>{c}</span>
-                    {category === c && <Icons.Check size={14} />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Price Range</label>
-              <div className="d-flex align-center gap-sm">
-                <input
-                  className="input"
-                  type="number"
-                  min="0"
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(Math.max(0, Number(e.target.value)))}
-                  style={{ maxWidth: 120 }}
-                  placeholder="Min"
-                />
-                <span className="text-muted">to</span>
-                <input
-                  className="input"
-                  type="number"
-                  min={priceMin}
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(Math.max(priceMin, Number(e.target.value)))}
-                  style={{ maxWidth: 120 }}
-                  placeholder="Max"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="form-label">Sort By</label>
-              <select className="input w-100" value={sort} onChange={(e) => setSort(e.target.value)}>
-                <option value="relevance">Relevance</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name">Name: A-Z</option>
-              </select>
-            </div>
+        {/* Sidebar Filters */}
+        <aside className="filters-sidebar card p-4 h-fit">
+          <div className="mb-4 search-input-wrapper">
+            <Icons.Search className="search-icon" />
+            <input
+              type="text"
+              className="input pl-5"
+              placeholder="Search products..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
-        </div>
 
-        {/* Product Grid */}
-        <div className="product-results">
-          {loading ? (
-            <div className="products-grid">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="card skeleton" style={{ height: 300 }} />
+          <div className="mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted mb-3">Categories</h3>
+            <div className="filter-options">
+              {['all', 'vegetables', 'fruit', 'bakery', 'dairy', 'meat', 'pantry'].map((c) => (
+                <button
+                  key={c}
+                  className={`btn sm justify-start capitalize ${category === c ? 'btn-primary' : 'btn-ghost'}`}
+                  onClick={() => setCategory(c)}
+                >
+                  {c}
+                </button>
               ))}
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="card p-5 text-center">
-              <div style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                <Icons.Search size={48} />
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted mb-3">Price Range</h3>
+            <div className="d-flex align-center gap-sm mb-2">
+              <input
+                type="number"
+                className="input sm"
+                value={priceMin}
+                onChange={(e) => setPriceMin(Number(e.target.value))}
+                min="0"
+              />
+              <span className="text-muted">-</span>
+              <input
+                type="number"
+                className="input sm"
+                value={priceMax}
+                onChange={(e) => setPriceMax(Number(e.target.value))}
+                min="0"
+              />
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={priceMax}
+              onChange={(e) => setPriceMax(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted mb-3">Sort By</h3>
+            <select
+              className="input w-full"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="name">Name (A-Z)</option>
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+            </select>
+          </div>
+        </aside>
+
+        {/* Product Grid */}
+        <div className="products-grid">
+          {sorted.length > 0 ? (
+            sorted.map((p) => (
+              <ProductCard key={p.id} product={p} onAdd={add} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-50">
+              <div className="text-muted mb-3">
+                <Icons.Search size={48} className="opacity-20" />
               </div>
               <h3>No products found</h3>
-              <p className="text-muted">Try adjusting your search or filters to find what you're looking for.</p>
-              <button className="btn btn-outline mt-3" onClick={() => { setQuery(''); setCategory('all'); }}>Clear Filters</button>
-            </div>
-          ) : (
-            <div className="d-flex flex-column gap-md">
-              <div className="d-flex justify-between align-center">
-                <span className="text-muted">{filtered.length} products found</span>
-                <div className="d-flex gap-sm flex-wrap">
-                  {query && (
-                    <button className="btn secondary sm" onClick={() => setQuery('')}>
-                      “{query}” ×
-                    </button>
-                  )}
-                  {category !== 'all' && (
-                    <button className="btn secondary sm" onClick={() => setCategory('all')}>
-                      {category} ×
-                    </button>
-                  )}
-                  {(priceMin > 0 || priceMax < 9999) && (
-                    <button className="btn secondary sm" onClick={() => { setPriceMin(0); setPriceMax(9999); }}>
-                      ${priceMin}–${priceMax} ×
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="products-grid">
-                {sorted.map((p) => (
-                  <ProductCard key={p.id} product={p} onAdd={(item) => cart.add(item)} />
-                ))}
-              </div>
+              <p className="text-muted">Try adjusting your filters or search query</p>
             </div>
           )}
         </div>

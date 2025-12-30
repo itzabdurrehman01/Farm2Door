@@ -52,14 +52,14 @@ function Checkout() {
       <div className="checkout-layout">
         <div className="card p-5">
           <h3 className="mb-4 d-flex align-center gap-sm">
-            <div className="bg-primary text-white rounded-circle d-flex align-center justify-center p-0" style={{ width: 32, height: 32, fontSize: '1rem', background: 'var(--primary)' }}>1</div>
+            <div className="bg-brand rounded-circle d-flex align-center justify-center p-0 w-8 h-8 font-medium">1</div>
             Delivery Details
           </h3>
 
           <form id="checkout-form" onSubmit={placeOrder} className="d-grid gap-md">
             <div className="seg p-1 bg-secondary rounded d-flex mb-2">
-              <button type="button" className={`btn flex-1 ${method === 'delivery' ? 'shadow-sm' : 'text-muted'}`} style={{ background: method === 'delivery' ? 'white' : 'transparent' }} onClick={() => setMethod('delivery')}>Delivery</button>
-              <button type="button" className={`btn flex-1 ${method === 'pickup' ? 'shadow-sm' : 'text-muted'}`} style={{ background: method === 'pickup' ? 'white' : 'transparent' }} onClick={() => setMethod('pickup')}>Pickup</button>
+              <button type="button" className={`btn flex-1 ${method === 'delivery' ? 'shadow-sm bg-white' : 'text-muted bg-transparent'}`} onClick={() => setMethod('delivery')}>Delivery</button>
+              <button type="button" className={`btn flex-1 ${method === 'pickup' ? 'shadow-sm bg-white' : 'text-muted bg-transparent'}`} onClick={() => setMethod('pickup')}>Pickup</button>
             </div>
 
             <div className="grid-2">
@@ -97,11 +97,11 @@ function Checkout() {
         <div>
           <div className="card p-4 sticky-summary">
             <h3 className="mb-3">Order Summary</h3>
-            <div className="checkout-items mb-3" style={{ maxHeight: 300, overflowY: 'auto' }}>
+            <div className="cart-items-list mb-3">
               {cart.items.map((i) => (
                 <div key={i.id} className="d-flex justify-between align-center mb-2 pb-2 border-bottom">
                   <div>
-                    <div style={{ fontWeight: 500 }}>{i.name}</div>
+                    <div className="font-medium">{i.name}</div>
                     <small className="text-muted">Qty: {i.qty}</small>
                   </div>
                   <div>${((i.price || 0) * i.qty).toFixed(2)}</div>
@@ -122,20 +122,20 @@ function Checkout() {
               <span>${cart.total.toFixed(2)}</span>
             </div>
             {promo.trim().toUpperCase() === 'LOCAL10' && (
-              <div className="d-flex justify-between mb-2 text-success" style={{ color: 'var(--primary)' }}>
+              <div className="d-flex justify-between mb-2 text-success text-brand">
                 <span>Discount (10%)</span>
                 <span>-${(cart.total * 0.1).toFixed(2)}</span>
               </div>
             )}
             <div className="d-flex justify-between mb-4">
-              <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>Total</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--primary)' }}>
+              <span className="text-xl font-bold">Total</span>
+              <span className="text-xl font-bold text-brand">
                 ${(cart.total * (promo.trim().toUpperCase() === 'LOCAL10' ? 0.9 : 1)).toFixed(2)}
               </span>
             </div>
 
             <button className="btn btn-primary w-100 py-3 justify-center" type="submit" form="checkout-form">
-              <Icons.CreditCard size={20} style={{ marginRight: 8 }} />
+              <Icons.CreditCard size={20} className="mr-2" />
               {submitting ? 'Placing...' : 'Confirm Order'}
             </button>
           </div>
