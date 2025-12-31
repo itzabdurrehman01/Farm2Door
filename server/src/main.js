@@ -339,6 +339,41 @@ async function bootstrap() {
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 
+  // Stripe Checkout Session (Card Payments)
+  expressApp.post('/payments/stripe/checkout_session', requireAuth, async (req, res) => {
+    try {
+      const secret = process.env.STRIPE_SECRET;
+      if (!secret) return res.status(501).json({ error: 'Stripe not configured. Set STRIPE_SECRET env var.' });
+      let stripe;
+      try {
+        stripe = require('stripe')(secret);
+      } catch (e) {
+        return res.status(501).json({ error: 'Stripe SDK not installed. Run: npm install stripe in server.' });
+      }
+      const amt = Number(req.body.amount);
+      const currency = (req.body.currency || 'usd').toLowerCase();
+      if (Number.isNaN(amt) || amt <= 0) return res.status(400).json({ error: 'Invalid amount' });
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency,
+            product_data: { name: 'Farm2Door Order' },
+            unit_amount: Math.round(amt * 100),
+          },
+          quantity: 1,
+        }],
+        success_url: 'http://localhost:3001/checkout?success=1',
+        cancel_url: 'http://localhost:3001/checkout?cancel=1',
+        metadata: { user_id: String(req.user.id) },
+      });
+      res.json({ id: session.id, url: session.url });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   expressApp.get('/reports/summary', requireRole('admin'), async (req, res) => {
     try {
       const users = await pool.query('SELECT COUNT(*)::int as count FROM users');
