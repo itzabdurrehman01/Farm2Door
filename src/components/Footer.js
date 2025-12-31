@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Icons } from "./Icons";
+import { useAuth } from "../state/AuthContext";
 
 function Footer() {
+  const auth = useAuth();
+  const role = auth?.role;
   return (
     <footer className="footer">
       <div className="container">
@@ -11,10 +14,10 @@ function Footer() {
             <div id="footer-brand" className="brand">
               <span className="d-flex align-center gap-sm">
                 <Icons.LogoMark />
-                <span>Farm2Door</span>
+                <span>Farm2Door Pakistan</span>
               </span>
             </div>
-            <p className="muted">Fresh food delivered direct from local farms.</p>
+            <p className="muted">Fresh food delivered direct from local Pakistani farms.</p>
             <form className="newsletter" onSubmit={(e) => e.preventDefault()}>
               <input className="input" type="email" placeholder="Your email for fresh updates" aria-label="Email address" />
               <button className="btn">Subscribe</button>
@@ -31,15 +34,17 @@ function Footer() {
                 <li><Link className="footer-link" to="/producers">Producers</Link></li>
               </ul>
             </div>
-            <div className="footer-col">
-              <div className="footer-title" id="footer-press">Press</div>
-              <ul>
-                <li><Link className="footer-link" to="/reports">Reports</Link></li>
-                <li><Link className="footer-link" to="/notifications">Announcements</Link></li>
-                <li><Link className="footer-link" to="/deliveries">Deliveries</Link></li>
-                <li><Link className="footer-link" to="/payments">Payments</Link></li>
-              </ul>
-            </div>
+            {role === 'admin' && (
+              <div className="footer-col">
+                <div className="footer-title" id="footer-admin">Admin</div>
+                <ul>
+                  <li><Link className="footer-link" to="/reports">Reports</Link></li>
+                  <li><Link className="footer-link" to="/notifications">Announcements</Link></li>
+                  <li><Link className="footer-link" to="/deliveries">Deliveries</Link></li>
+                  <li><Link className="footer-link" to="/payments">Payments</Link></li>
+                </ul>
+              </div>
+            )}
             <div className="footer-col">
               <div className="footer-title" id="footer-about">About</div>
               <ul>
@@ -74,7 +79,7 @@ function Footer() {
               </button>
             </div>
           </div>
-          <div className="copyright">© {new Date().getFullYear()} Farm2Door</div>
+          <div className="copyright">© {new Date().getFullYear()} Farm2Door Pakistan</div>
         </div>
       </div>
     </footer>

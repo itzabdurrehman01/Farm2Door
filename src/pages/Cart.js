@@ -1,9 +1,26 @@
 import { useCart } from '../state/CartContext';
 import { Link } from 'react-router-dom';
 import { Icons } from '../components/Icons';
+import { useState, useEffect } from 'react';
+import { apiGet } from '../api';
+import ProductCard from '../components/ProductCard';
 
 function Cart() {
   const cart = useCart();
+  const [suggested, setSuggested] = useState([]);
+
+  useEffect(() => {
+    apiGet('/products')
+      .then((data) => {
+        const products = Array.isArray(data) ? data : (data.products || []);
+        // Filter out items already in cart to show relevant suggestions
+        const inCartIds = new Set(cart.items.map(i => i.id));
+        const available = products.filter(p => !inCartIds.has(p.id));
+        setSuggested(available.slice(0, 4));
+      })
+      .catch(() => {});
+  }, [cart.items]); // Re-run when cart changes to filter correctly
+
   return (
     <div className="container section py-50">
       <div className="section-header mb-4">
@@ -77,7 +94,7 @@ function Cart() {
                         </button>
                       </div>
                     </td>
-                    <td className="fw-bold text-primary">${((i.price || 0) * i.qty).toFixed(2)}</td>
+                    <td className="fw-bold text-primary">PKR{((i.price || 0) * i.qty).toFixed(2)}</td>
                     <td className="text-right pr-5">
                       <button
                         className="btn sm text-error"
@@ -99,7 +116,7 @@ function Cart() {
               <h3 className="mb-3">Order Summary</h3>
               <div className="d-flex justify-between mb-2">
                 <span className="text-muted">Subtotal</span>
-                <span>${cart.total.toFixed(2)}</span>
+                <span>PKR{cart.total.toFixed(2)}</span>
               </div>
               <div className="d-flex justify-between mb-4">
                 <span className="text-muted">Shipping</span>
@@ -109,7 +126,7 @@ function Cart() {
               <div className="d-flex justify-between mb-4">
                 <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>Total</span>
                 <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--primary)' }}>
-                  ${cart.total.toFixed(2)}
+                  PKR{cart.total.toFixed(2)}
                 </span>
               </div>
               <Link className="btn btn-primary w-100 justify-center" to="/checkout">
@@ -119,6 +136,17 @@ function Cart() {
                 Continue Shopping
               </Link>
             </div>
+          </div>
+        </div>
+      )}
+
+      {suggested.length > 0 && (
+        <div className="mt-5">
+          <h3 className="mb-4">You might also like</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+            {suggested.map((p) => (
+              <ProductCard key={p.id} product={p} onAdd={cart.add} />
+            ))}
           </div>
         </div>
       )}

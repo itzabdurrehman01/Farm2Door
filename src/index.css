@@ -1,9 +1,9 @@
 :root {
   /* Premium Farm Palette */
-  --primary: #1B4332;
-  /* Deep Forest Green */
-  --primary-light: #2D6A4F;
-  --primary-dark: #081c15;
+  --primary: #2E7D32;
+  /* Fresh Green */
+  --primary-light: #3FA64A;
+  --primary-dark: #1B5E20;
   --secondary: #D8F3DC;
   /* Soft Mint */
   --accent: #E09F3E;
@@ -22,6 +22,17 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
+
+  /* Cross-library tokens for design_system.css (light) */
+  --primary-color: var(--primary);
+  --primary-hover: var(--primary-light);
+  --accent-color: var(--accent);
+  --bg-primary: var(--bg-body);
+  --bg-secondary: var(--bg-card);
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --text-light: #ffffff;
+  --border-color: #e5e7eb;
 }
 
 .theme-dark {
@@ -39,6 +50,14 @@
   --border-color: #262626;
   --shadow-sm: 0 2px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 12px 20px -6px rgba(0, 0, 0, 0.45), 0 6px 10px -4px rgba(0, 0, 0, 0.35);
+
+  /* Cross-library tokens for design_system.css (dark) */
+  --primary-color: var(--primary);
+  --primary-hover: var(--primary-light);
+  --accent-color: var(--accent);
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --text-light: #ffffff;
 }
 
 /* Dark-mode component overrides */
@@ -49,6 +68,69 @@
 }
 .theme-dark .sidebar-link:hover {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.theme-dark .navbar {
+  background: #0a0a0a;
+  border-bottom: 1px solid #262626;
+}
+
+.theme-dark .card {
+  background: #0a0a0a;
+  border: 1px solid #262626;
+}
+
+.theme-dark .input {
+  background: #121212;
+  border-color: #262626;
+  color: #e5e7eb;
+}
+
+/* Mixed dark+light theme applied per page - REMOVED for clean switch */
+/* 
+.theme-mix body {
+  background: linear-gradient(120deg, #0b0f14 0%, #1a1625 45%, #F4F7F5 100%);
+}
+...
+*/
+
+.toast-container {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: 10px;
+  z-index: 1000;
+}
+.toast {
+  min-width: 240px;
+  max-width: 320px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+.toast.success { border-color: #16a34a; }
+.toast.error { border-color: #dc2626; }
+.toast-message { color: var(--text-main); }
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
 * {

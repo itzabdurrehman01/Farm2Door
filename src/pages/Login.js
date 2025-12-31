@@ -9,6 +9,7 @@ function Login() {
   const [role, setRole] = useState('customer');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ function Login() {
   }
 
   return (
-    <div className="auth-layout">
+    <div className="auth-layout auth-theme">
       <aside className="auth-sidebar">
         <div className="auth-sidebar-bg" />
         <div className="auth-sidebar-content">
@@ -61,14 +62,14 @@ function Login() {
               className={`role-btn ${role === 'customer' ? 'active' : ''}`}
               onClick={() => setRole('customer')}
             >
-              Customer
+              <span className="d-flex align-center gap-sm"><Icons.User size={16} /> Customer</span>
             </button>
             <button
               type="button"
               className={`role-btn ${role === 'admin' ? 'active' : ''}`}
               onClick={() => setRole('admin')}
             >
-              Admin
+              <span className="d-flex align-center gap-sm"><Icons.Lock size={16} /> Admin</span>
             </button>
           </div>
 
@@ -80,10 +81,12 @@ function Login() {
               <div className="input-icon-wrap">
                 <Icons.User size={18} className="input-icon" />
                 <input
+                  type="email"
                   className="input w-full input-with-icon"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoFocus
                   required
                 />
               </div>
@@ -94,22 +97,34 @@ function Login() {
                 <label className="text-sm font-medium">Password</label>
                 <Link to="/password-reset" className="text-sm text-primary hover-underline">Forgot?</Link>
               </div>
-              <div className="input-icon-wrap">
+              <div className="input-icon-wrap" style={{ position: 'relative' }}>
                 <Icons.Lock size={18} className="input-icon" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   className="input w-full input-with-icon"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  className="btn-ghost text-muted"
+                  onClick={() => setShowPassword(v => !v)}
+                  style={{ position: 'absolute', right: 8, top: 6 }}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
             </div>
 
             <button type="submit" className="btn btn-primary w-full mt-2" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
+            <div className="auth-social">
+              <button type="button" className="social-btn"><Icons.User size={16} /> Continue with Google</button>
+              <button type="button" className="social-btn"><Icons.User size={16} /> Continue with Apple</button>
+            </div>
 
             <p className="text-center text-sm text-muted mt-4">
               Don't have an account? <Link to="/register" className="text-primary font-medium hover-underline">Create one</Link>

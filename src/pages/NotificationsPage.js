@@ -47,20 +47,22 @@ function NotificationsPage() {
       </div>
       <div className="card p-4 mb-4 bg-secondary">
         <h4 className="mb-3">Create Notification</h4>
-        <form onSubmit={add} className="d-flex gap-sm align-end flex-wrap">
-          <div className="flex-1" style={{ minWidth: 180 }}>
+        <form onSubmit={add} className="form-grid">
+          <div>
             <label className="d-block text-sm mb-1">User ID (optional)</label>
             <input className="input w-100" placeholder="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} />
           </div>
-          <div className="flex-1" style={{ minWidth: 280 }}>
+          <div>
             <label className="d-block text-sm mb-1">Message</label>
             <input className="input w-100" placeholder="Your order is on the way" value={message} onChange={(e) => setMessage(e.target.value)} required />
           </div>
-          <div className="flex-1" style={{ minWidth: 160 }}>
+          <div>
             <label className="d-block text-sm mb-1">Status</label>
             <input className="input w-100" placeholder="queued" value={status} onChange={(e) => setStatus(e.target.value)} />
           </div>
-            <button className="btn" type="submit" disabled={submitting}>{submitting ? 'Adding...' : 'Add Notification'}</button>
+          <div>
+            <button className="btn w-100" type="submit" disabled={submitting}>{submitting ? 'Adding...' : 'Add Notification'}</button>
+          </div>
         </form>
       </div>
       <div className="card p-0 overflow-hidden">

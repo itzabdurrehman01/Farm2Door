@@ -1,20 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../state/CartContext';
+import { useAuth } from '../state/AuthContext';
 import { apiPost } from '../api';
 import { Icons } from '../components/Icons';
 import { Link } from 'react-router-dom';
+import { useToast } from '../state/ToastContext';
+import { track } from '../utils/analytics';
 
 function Checkout() {
   const cart = useCart();
+  const { user } = useAuth();
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('pending');
   const [message, setMessage] = useState('');
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setUserId(user.id || '');
+    }
+  }, [user]);
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [method, setMethod] = useState('delivery');
   const [promo, setPromo] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const toast = useToast();
 
   async function placeOrder(e) {
     e.preventDefault();
@@ -26,8 +39,35 @@ function Checkout() {
       const order = await apiPost('/orders', { user_id: parseInt(userId, 10) || 1, total_amount, status });
       setMessage(`Order #${order.id} placed successfully!`);
       cart.clear();
+      track('checkout_confirm', { order_id: order.id, amount: total_amount });
+      toast?.show('success', `Order #${order.id} confirmed`);
     } catch (err) { setMessage(err.message || 'Failed to place order'); }
     finally { setSubmitting(false); }
+  }
+
+  async function payWithStripe() {
+    const discount = promo.trim().toUpperCase() === 'LOCAL10' ? 0.1 : 0;
+    const amount = Number((cart.total * (1 - discount)).toFixed(2));
+    if (amount <= 0) return alert('Cart is empty');
+    try {
+      setPaying(true);
+      const r = await apiPost('/payments/stripe/checkout_session', { amount, currency: 'usd' });
+      if (r && r.url) {
+        track('stripe_redirect', { amount });
+        window.location.href = r.url;
+      } else if (r && r.error) {
+        toast?.show('error', r.error);
+        alert(r.error);
+      } else {
+        toast?.show('error', 'Stripe session creation failed');
+        alert('Stripe session creation failed');
+      }
+    } catch (e) {
+      toast?.show('error', e.message || 'Stripe error');
+      alert(e.message || 'Stripe error');
+    } finally {
+      setPaying(false);
+    }
   }
 
   if (message) {
@@ -79,11 +119,11 @@ function Checkout() {
             </div>
 
             <div className="grid-2">
-              <div className="form-group">
+              <div className="form-group" style={{ display: user?.role === 'admin' ? 'block' : 'none' }}>
                 <label className="form-label">User ID (Simulated)</label>
                 <input className="input w-100" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Enter ID for testing" />
               </div>
-              <div className="form-group">
+              <div className="form-group" style={{ display: user?.role === 'admin' ? 'block' : 'none' }}>
                 <label className="form-label">Test Status</label>
                 <select className="input w-100" value={status} onChange={(e) => setStatus(e.target.value)}>
                   <option value="pending">Pending</option>
@@ -104,7 +144,7 @@ function Checkout() {
                     <div className="font-medium">{i.name}</div>
                     <small className="text-muted">Qty: {i.qty}</small>
                   </div>
-                  <div>${((i.price || 0) * i.qty).toFixed(2)}</div>
+                  <div>PKR{((i.price || 0) * i.qty).toFixed(2)}</div>
                 </div>
               ))}
             </div>
@@ -119,18 +159,18 @@ function Checkout() {
 
             <div className="d-flex justify-between mb-2">
               <span className="text-muted">Subtotal</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span>PKR{cart.total.toFixed(2)}</span>
             </div>
             {promo.trim().toUpperCase() === 'LOCAL10' && (
               <div className="d-flex justify-between mb-2 text-success text-brand">
                 <span>Discount (10%)</span>
-                <span>-${(cart.total * 0.1).toFixed(2)}</span>
+                <span>-PKR{(cart.total * 0.1).toFixed(2)}</span>
               </div>
             )}
             <div className="d-flex justify-between mb-4">
               <span className="text-xl font-bold">Total</span>
               <span className="text-xl font-bold text-brand">
-                ${(cart.total * (promo.trim().toUpperCase() === 'LOCAL10' ? 0.9 : 1)).toFixed(2)}
+                PKR{(cart.total * (promo.trim().toUpperCase() === 'LOCAL10' ? 0.9 : 1)).toFixed(2)}
               </span>
             </div>
 
@@ -138,6 +178,12 @@ function Checkout() {
               <Icons.CreditCard size={20} className="mr-2" />
               {submitting ? 'Placing...' : 'Confirm Order'}
             </button>
+            <div className="d-grid gap-sm" style={{ marginTop: '0.75rem' }}>
+              <button className="btn w-100" type="button" onClick={payWithStripe} disabled={paying}>
+                <Icons.CreditCard size={18} />
+                {paying ? 'Redirecting…' : 'Pay with Card (Stripe)'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

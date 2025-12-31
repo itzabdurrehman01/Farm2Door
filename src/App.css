@@ -80,7 +80,7 @@
   right: 0;
   height: 3px;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
 }
 
 /* Search Bar */
@@ -120,11 +120,15 @@
 .search-btn {
   position: absolute;
   left: 10px;
-  background: none;
+  background: var(--primary);
   border: none;
-  color: var(--text-muted);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 /* Icons & Buttons */

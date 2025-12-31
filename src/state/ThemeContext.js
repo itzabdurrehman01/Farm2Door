@@ -5,16 +5,22 @@ const ThemeCtx = createContext(null);
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
-    if (saved === 'light' || saved === 'dark') return saved;
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? 'dark' : 'light';
+    return saved === 'dark' ? 'dark' : 'light';
   });
+
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') root.classList.add('theme-dark');
-    else root.classList.remove('theme-dark');
+    root.classList.remove('theme-mix'); // Ensure theme-mix is gone
+    if (theme === 'dark') {
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-light');
+    } else {
+      root.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+    }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
   const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
   const value = useMemo(() => ({ theme, toggle }), [theme]);
   return <ThemeCtx.Provider value={value}>{children}</ThemeCtx.Provider>;

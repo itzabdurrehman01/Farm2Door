@@ -67,7 +67,11 @@ function SuppliersPage() {
           />
         </div>
         {loading ? (
-          <div className="p-5 text-center text-muted">Loading suppliers...</div>
+          <div className="p-5">
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24 }} />
+          </div>
         ) : error ? (
           <div className="p-5 text-center text-muted">{error}</div>
         ) : filtered.length === 0 ? (

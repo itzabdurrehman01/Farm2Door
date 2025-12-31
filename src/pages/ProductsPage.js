@@ -85,7 +85,11 @@ function ProductsPage() {
           />
         </div>
         {loading ? (
-          <div className="p-5 text-center text-muted">Loading products...</div>
+          <div className="p-5">
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24 }} />
+          </div>
         ) : error ? (
           <div className="p-5 text-center text-muted">{error}</div>
         ) : filtered.length === 0 ? (
@@ -105,7 +109,7 @@ function ProductsPage() {
                 <tr key={p.id} className="transition-colors hover-bg-secondary">
                   <td className="py-3 px-4 text-muted">#{p.id}</td>
                   <td className="py-3 px-4 fw-bold">{p.name}</td>
-                  <td className="py-3 px-4">${(Number(p.price) || 0).toFixed(2)}</td>
+                  <td className="py-3 px-4">PKR{(Number(p.price) || 0).toFixed(2)}</td>
                   <td className="py-3 px-4">{p.unit}</td>
                 </tr>
               ))}

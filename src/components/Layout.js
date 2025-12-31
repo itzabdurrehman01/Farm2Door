@@ -5,6 +5,7 @@ import NavBar from './NavBar';
 import Sidebar from './Sidebar';
 import { Outlet } from 'react-router-dom';
 import Footer from './Footer';
+import ToastContainer from './ToastContainer';
 
 function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -29,7 +30,7 @@ function Layout() {
       <div className="main-wrapper">
         {showSidebar && (
           <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-            <Sidebar />
+            <Sidebar onClose={() => setSidebarOpen(false)} />
           </aside>
         )}
 
@@ -40,7 +41,8 @@ function Layout() {
         </main>
       </div>
 
-      {!showSidebar && <Footer />}
+      <Footer />
+      <ToastContainer />
     </div>
   );
 }

@@ -17,7 +17,7 @@ function Home() {
                 Delivered to Your Door
               </h1>
               <p className="hero-subtitle">
-                Support local farmers and enjoy the freshest seasonal produce, meats, and artisan goods available in North Simcoe.
+                Support Pakistani farmers and enjoy the freshest seasonal produce, meats, and artisan goods from across Pakistan.
               </p>
               <div className="d-flex gap-md anim-scale-in">
                 <Link className="btn btn-primary btn-lg" to="/catalog">
@@ -36,7 +36,7 @@ function Home() {
 
       <div className="delivery-banner">
         <div className="container">
-          <span className="d-inline-flex align-center gap-sm"><Icons.Truck /> Delivering to: Tiny, Tay, Midland & Penetanguishene</span>
+          <span className="d-inline-flex align-center gap-sm"><Icons.Truck /> Delivering to: Karachi, Lahore, Islamabad & Rawalpindi</span>
         </div>
       </div>
 
@@ -67,13 +67,13 @@ function Home() {
 
       <section className="section py-50 bg-secondary">
         <div className="container">
-          <h2 className="section-title text-center mb-5">Why Choose Farm2Door?</h2>
+          <h2 className="section-title text-center mb-5">Why Choose Farm2Door Pakistan?</h2>
 
           <div className="grid grid-3">
             <div className="text-center p-4">
               <div className="feature-icon-wrap mx-auto mb-3"><Icons.Sprout className="feature-icon" /></div>
               <h3>100% Local</h3>
-              <p className="text-muted">Every product comes directly from farmers and producers in your community.</p>
+              <p className="text-muted">Products come directly from Pakistani farmers and producers in your region.</p>
             </div>
             <div className="text-center p-4">
               <div className="feature-icon-wrap mx-auto mb-3"><Icons.Tractor className="feature-icon" /></div>
@@ -83,7 +83,7 @@ function Home() {
             <div className="text-center p-4">
               <div className="feature-icon-wrap mx-auto mb-3"><Icons.Handshake className="feature-icon" /></div>
               <h3>Fair to Producers</h3>
-              <p className="text-muted">We ensure our local partners get a fair share, helping our local economy thrive.</p>
+              <p className="text-muted">We ensure our local partners get a fair share, strengthening Pakistan’s rural economy.</p>
             </div>
           </div>
         </div>
@@ -101,6 +101,24 @@ function Home() {
             ].map((s) => (
               <ProductCard key={s.id} product={s} onAdd={add} />
             ))}
+          </div>
+        </div>
+      </section>
+      <section className="section py-50 bg-primary text-white text-center">
+        <div className="container">
+          <div className="max-w-600 mx-auto">
+            <h2 className="mb-3">Join Our Community</h2>
+            <p className="mb-4 text-white-80">Subscribe to our newsletter for exclusive offers, seasonal recipes, and updates from our partner farms.</p>
+            <form className="d-flex gap-sm" onSubmit={(e) => { e.preventDefault(); alert('Thanks for subscribing!'); }}>
+              <input 
+                type="email" 
+                placeholder="Enter your email address" 
+                className="input flex-1 border-0" 
+                style={{ height: '48px' }}
+                required 
+              />
+              <button type="submit" className="btn bg-white text-primary fw-bold px-5 hover-scale">Subscribe</button>
+            </form>
           </div>
         </div>
       </section>

@@ -2,13 +2,14 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../state/AuthContext';
 import { Icons } from './Icons';
 
-function Sidebar() {
+function Sidebar({ onClose }) {
   const auth = useAuth();
   const role = auth?.role;
   const LinkItem = ({ to, icon, label }) => (
     <NavLink
       to={to}
       className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+      onClick={onClose}
     >
       {icon}
       <span>{label}</span>
@@ -22,6 +23,7 @@ function Sidebar() {
         <LinkItem to="/catalog" icon={<Icons.Search size={16} />} label="Catalog" />
         <LinkItem to="/cart" icon={<Icons.ShoppingCart size={16} />} label="Cart" />
         <LinkItem to="/checkout" icon={<Icons.CreditCard size={16} />} label="Checkout" />
+        <LinkItem to="/orders" icon={<Icons.ShoppingCart size={16} />} label="Orders" />
       </div>
       {role === 'admin' && (
         <div className="sidebar-section">

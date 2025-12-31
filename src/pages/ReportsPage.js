@@ -71,6 +71,33 @@ function ReportsPage() {
             </Link>
           </div>
         </div>
+
+        <div className="card p-4">
+          <h3 className="mb-3">Recent Activity</h3>
+          <div className="d-grid gap-sm">
+             <div className="d-flex justify-between align-center p-2 border-bottom">
+               <div>
+                 <div className="font-bold">New Order #1024</div>
+                 <small className="text-muted">2 mins ago</small>
+               </div>
+               <span className="badge badge-warning">Pending</span>
+             </div>
+             <div className="d-flex justify-between align-center p-2 border-bottom">
+               <div>
+                 <div className="font-bold">New User Registered</div>
+                 <small className="text-muted">15 mins ago</small>
+               </div>
+               <span className="badge badge-primary">New</span>
+             </div>
+             <div className="d-flex justify-between align-center p-2">
+               <div>
+                 <div className="font-bold">Order #1023 Delivered</div>
+                 <small className="text-muted">1 hour ago</small>
+               </div>
+               <span className="badge badge-success">Delivered</span>
+             </div>
+          </div>
+        </div>
       </div>
     </div>
   );

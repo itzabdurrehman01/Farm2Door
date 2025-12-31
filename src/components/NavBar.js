@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../state/AuthContext';
 import { useCart } from '../state/CartContext';
+import { useWishlist } from '../state/WishlistContext';
 import { apiGet } from '../api';
 import { Icons } from './Icons';
 import { useTheme } from '../state/ThemeContext';
@@ -14,6 +15,7 @@ function NavBar({ onToggle, onThemeToggle }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const cart = useCart();
+  const wishlist = useWishlist();
   const navigate = useNavigate();
   const auth = useAuth();
   const { theme, toggle } = useTheme();
@@ -54,7 +56,7 @@ function NavBar({ onToggle, onThemeToggle }) {
           )}
           <Link to="/" className="brand-logo d-flex align-center gap-sm">
             <Icons.LogoMark />
-            <span>Farm2Door</span>
+            <span>Farm2Door Pakistan</span>
           </Link>
         </div>
 
@@ -117,6 +119,11 @@ function NavBar({ onToggle, onThemeToggle }) {
           >
             {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
           </button>
+
+          <Link to="/wishlist" className="icon-btn" aria-label="Wishlist">
+            <Icons.Heart size={24} />
+            {wishlist.items.length > 0 && <span className="cart-badge">{wishlist.items.length}</span>}
+          </Link>
 
           {(!auth.user || auth.role === 'customer') && (
             <div className="cart-wrapper">
@@ -187,6 +194,7 @@ function NavBar({ onToggle, onThemeToggle }) {
                       <Link to="/users" className="dropdown-item" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
                     </>
                   )}
+                  <Link to="/profile" className="dropdown-item" onClick={() => setIsMenuOpen(false)}>My Profile</Link>
                   <Link to="/orders" className="dropdown-item" onClick={() => setIsMenuOpen(false)}>My Orders</Link>
                   <hr />
                   <button className="dropdown-item text-danger" onClick={onLogout}>Logout</button>

@@ -93,7 +93,7 @@ function DeliveriesPage() {
                 <tr key={d.id} className="transition-colors hover-bg-secondary">
                   <td className="py-3 px-4 text-muted">#{d.id}</td>
                   <td className="py-3 px-4">#{d.order_id}</td>
-                  <td className="py-3 px-4"><span className={`badge ${d.status}`}>{d.status}</span></td>
+                  <td className="py-3 px-4"><span className={`badge ${d.status === 'delivered' ? 'badge-success' : 'badge-warning'}`}>{d.status}</span></td>
                   <td className="py-3 px-4">{d.eta || '-'}</td>
                 </tr>
               ))}

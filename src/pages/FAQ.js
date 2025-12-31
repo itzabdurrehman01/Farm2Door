@@ -2,9 +2,11 @@ import React from 'react';
 
 function FAQ() {
   const faqs = [
-    { q: 'Where do products come from?', a: 'From vetted local producers and farms.' },
-    { q: 'How does delivery work?', a: 'Choose delivery or pickup at checkout.' },
-    { q: 'Do I need an account?', a: 'Create an account to checkout and track orders.' }
+    { q: 'Where do products come from?', a: 'From vetted Pakistani producers and farms across Punjab, Sindh, Khyber Pakhtunkhwa and Balochistan.' },
+    { q: 'Are products halal?', a: 'We prioritize halal-certified items and list sourcing details on each product.' },
+    { q: 'What payment methods are supported?', a: 'Cash on Delivery, JazzCash and Easypaisa are supported. Card payments via Stripe are being piloted.' },
+    { q: 'How does delivery work?', a: 'City-based delivery windows are offered in Karachi, Lahore, Islamabad and Rawalpindi. Pickup from partner hubs is available in select areas.' },
+    { q: 'Do I need an account?', a: 'Create an account to checkout, save your address, and track orders.' }
   ];
   return (
     <div className="container section py-50">

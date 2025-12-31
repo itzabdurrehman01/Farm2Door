@@ -4,9 +4,12 @@ import { apiGet } from '../api';
 import ProductCard from '../components/ProductCard';
 import { Icons } from '../components/Icons';
 import { useCart } from '../state/CartContext';
+import { useToast } from '../state/ToastContext';
+import { track } from '../utils/analytics';
 
 function Catalog() {
   const { add } = useCart();
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState('');
@@ -38,7 +41,10 @@ function Catalog() {
           { id: 3, name: 'Free-range Eggs', price: 5.99, unit: 'dozen', category: 'dairy', image: 'https://images.unsplash.com/photo-1582722878654-02fd235dd7c2?auto=format&fit=crop&w=800&q=80' },
           { id: 4, name: 'Local Honey', price: 12.00, unit: 'jar', category: 'pantry', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80' },
           { id: 5, name: 'Fresh Strawberries', price: 4.99, unit: 'basket', category: 'fruit', image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=800&q=80' },
-          { id: 6, name: 'Artisan Cheese', price: 9.99, unit: 'block', category: 'dairy', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80' }
+          { id: 6, name: 'Artisan Cheese', price: 9.99, unit: 'block', category: 'dairy', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80' },
+          { id: 7, name: 'Red Apples', price: 3.99, unit: 'kg', category: 'fruit', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=800&q=80' },
+          { id: 8, name: 'Fresh Milk', price: 4.50, unit: 'liter', category: 'dairy', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80' },
+          { id: 9, name: 'Tomatoes', price: 2.49, unit: 'kg', category: 'vegetables', image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80' }
         ]);
       });
   }, []);
@@ -143,7 +149,15 @@ function Catalog() {
         <div className="products-grid">
           {sorted.length > 0 ? (
             sorted.map((p) => (
-              <ProductCard key={p.id} product={p} onAdd={add} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                onAdd={(item) => {
+                  add(item);
+                  track('add_to_cart', { id: item.id, name: item.name, price: item.price });
+                  toast?.show('success', `${item.name} added to cart`);
+                }}
+              />
             ))
           ) : (
             <div className="col-span-full text-center py-50">

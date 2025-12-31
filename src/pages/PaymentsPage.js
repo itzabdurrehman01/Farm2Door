@@ -11,11 +11,13 @@ function PaymentsPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [query, setQuery] = useState('');
+
   useEffect(() => {
     apiGet('/payments')
       .then((d) => { setItems(d); setLoading(false); })
       .catch(() => { setError('Failed to load payments'); setLoading(false); });
   }, []);
+
   async function add(e) {
     e.preventDefault();
     const oid = parseInt(orderId, 10);
@@ -33,11 +35,33 @@ function PaymentsPage() {
       setSubmitting(false);
     }
   }
-  const filtered = items.filter((p) =>
-    String(p.method || '').toLowerCase().includes(query.toLowerCase()) ||
-    String(p.status || '').toLowerCase().includes(query.toLowerCase()) ||
-    String(p.order_id).includes(query)
-  );
+
+  const filtered = items.filter((p) => {
+    const matchesQuery = String(p.method || '').toLowerCase().includes(query.toLowerCase()) ||
+      String(p.status || '').toLowerCase().includes(query.toLowerCase()) ||
+      String(p.order_id).includes(query);
+    return matchesQuery;
+  });
+
+  const totalRevenue = items.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+  const pendingCount = items.filter(i => i.status === 'pending').length;
+  const successCount = items.filter(i => i.status === 'paid' || i.status === 'success').length;
+
+  const exportCSV = () => {
+    const headers = ['ID,Order ID,Amount,Method,Status'];
+    const rows = items.map(p => 
+      `${p.id},${p.order_id},${p.amount},${p.method},${p.status}`
+    );
+    const csvContent = "data:text/csv;charset=utf-8," + headers.concat(rows).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "payments_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="container section py-50">
       <div className="d-flex justify-between align-center mb-4">
@@ -45,8 +69,31 @@ function PaymentsPage() {
           <h2 className="section-title m-0">Payments</h2>
           <p className="text-muted">Review transactions and payment methods.</p>
         </div>
-        <button className="btn"><Icons.CreditCard size={18} /> Export CSV</button>
+        <button className="btn btn-outline" onClick={exportCSV}>
+          <Icons.CreditCard size={18} /> Export CSV
+        </button>
       </div>
+
+      {/* Summary Stats */}
+      <div className="d-flex gap-md mb-4 flex-wrap">
+        <div className="card p-3 flex-1 text-center">
+          <h3 className="text-primary text-2xl m-0">PKR{totalRevenue.toFixed(2)}</h3>
+          <p className="text-muted text-sm uppercase tracking-wider">Total Revenue</p>
+        </div>
+        <div className="card p-3 flex-1 text-center">
+          <h3 className="text-2xl m-0">{items.length}</h3>
+          <p className="text-muted text-sm uppercase tracking-wider">Transactions</p>
+        </div>
+        <div className="card p-3 flex-1 text-center">
+          <h3 className="text-warning text-2xl m-0" style={{color: '#f59e0b'}}>{pendingCount}</h3>
+          <p className="text-muted text-sm uppercase tracking-wider">Pending</p>
+        </div>
+        <div className="card p-3 flex-1 text-center">
+          <h3 className="text-success text-2xl m-0" style={{color: '#10b981'}}>{successCount}</h3>
+          <p className="text-muted text-sm uppercase tracking-wider">Completed</p>
+        </div>
+      </div>
+
       <div className="card p-4 mb-4 bg-secondary">
         <h4 className="mb-3">Add Payment</h4>
         <form onSubmit={add} className="d-flex gap-sm align-end flex-wrap">
@@ -76,7 +123,11 @@ function PaymentsPage() {
           />
         </div>
         {loading ? (
-          <div className="p-5 text-center text-muted">Loading payments...</div>
+          <div className="p-5">
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24, marginBottom: 12 }} />
+            <div className="skeleton" style={{ height: 24 }} />
+          </div>
         ) : error ? (
           <div className="p-5 text-center text-muted">{error}</div>
         ) : filtered.length === 0 ? (
@@ -97,9 +148,9 @@ function PaymentsPage() {
                 <tr key={p.id} className="transition-colors hover-bg-secondary">
                   <td className="py-3 px-4 text-muted">#{p.id}</td>
                   <td className="py-3 px-4">#{p.order_id}</td>
-                  <td className="py-3 px-4">${(Number(p.amount) || 0).toFixed(2)}</td>
-                  <td className="py-3 px-4"><span className={`badge ${p.method}`}>{p.method}</span></td>
-                  <td className="py-3 px-4"><span className={`badge ${p.status}`}>{p.status}</span></td>
+                  <td className="py-3 px-4">PKR{(Number(p.amount) || 0).toFixed(2)}</td>
+                  <td className="py-3 px-4"><span className="badge">{p.method}</span></td>
+                  <td className="py-3 px-4"><span className="badge">{p.status}</span></td>
                 </tr>
               ))}
             </tbody>

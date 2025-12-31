@@ -363,8 +363,24 @@ button {
   opacity: 0.75;
 }
 
+.auth-layout {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+}
+
+.auth-sidebar {
+  width: 35%;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .auth-main {
-  width: 60%;
+  width: 65%;
   background-color: #f8fafc;
   display: flex;
   align-items: center;
@@ -374,9 +390,9 @@ button {
 
 .auth-card {
   width: 100%;
-  max-width: 480px;
+  max-width: 420px;
   background: white;
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
 }
@@ -386,7 +402,7 @@ button {
   padding: 0.25rem;
   border-radius: var(--radius-md);
   display: flex;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .role-btn {
@@ -418,6 +434,97 @@ button {
   left: 1rem;
   transform: translateY(-50%);
   color: var(--text-secondary);
+}
+
+/* =========================
+   Auth Dark Theme (Restored)
+   ========================= */
+.auth-theme {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #334155;
+  --input-bg: #334155;
+  
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.auth-theme .auth-main {
+  background-color: var(--bg-primary);
+}
+
+.auth-theme .auth-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.auth-theme .text-muted {
+  color: var(--text-secondary);
+}
+
+.auth-theme .input {
+  background-color: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.auth-theme .input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.auth-theme .input:focus {
+  border-color: var(--primary-color);
+  background-color: var(--input-bg);
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+}
+
+.auth-theme .role-selector {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+}
+
+.auth-theme .role-btn {
+  color: var(--text-secondary);
+}
+
+.auth-theme .role-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.auth-theme .role-btn:not(.active):hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.auth-theme .auth-sidebar {
+  background-color: #000;
+  color: white;
+}
+
+.auth-theme .auth-sidebar-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.auth-theme .auth-stats {
+  color: white;
+}
+
+.auth-theme .stat-label {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* =========================
@@ -455,6 +562,17 @@ button {
 .sidebar.closed {
   width: 0;
   overflow: hidden;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 40;
 }
 
 .sidebar-section {
@@ -956,9 +1074,14 @@ button {
 }
 
 .nav-toggle-btn {
-  display: none;
+  display: inline-flex;
   background: transparent;
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  align-items: center;
+  justify-content: center;
 }
 
 .badge {
@@ -1004,7 +1127,7 @@ button {
 
 @media (max-width: 900px) {
   .nav-toggle-btn {
-    display: block;
+    display: inline-flex;
   }
   .nav-links {
     display: none;
@@ -1307,6 +1430,13 @@ button {
   flex-direction: column;
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  align-items: end;
 }
 
 
