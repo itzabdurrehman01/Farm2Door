@@ -61,7 +61,9 @@ const UserSchema = new mongoose.Schema({
 const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   price: { type: Number, required: true },
-  unit: { type: String, required: true }
+  unit: { type: String, required: true },
+  category: { type: String, default: 'other' },
+  image: { type: String, default: '' }
 }, { timestamps: true });
 const OrderSchema = new mongoose.Schema({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -157,18 +159,18 @@ app.get('/products', async (req, res) => {
     const q = (req.query.q || '').toString().toLowerCase();
     const query = q ? { name: { $regex: q, $options: 'i' } } : {};
     const products = await Product.find(query).skip(skip).limit(limit).lean();
-    res.json(products.map(p => ({ id: p._id, name: p.name, price: p.price, unit: p.unit })));
+    res.json(products.map(p => ({ id: p._id, name: p.name, price: p.price, unit: p.unit, category: p.category, image: p.image })));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.post('/products', requireRole('admin'), async (req, res) => {
   try {
-    const { name, price, unit } = req.body;
+    const { name, price, unit, category, image } = req.body;
     const p = Number(price);
     if (!name || !unit || Number.isNaN(p) || p <= 0) return res.status(400).json({ error: 'Invalid product fields' });
     const exists = await Product.findOne({ name });
     if (exists) return res.status(409).json({ error: 'Product already exists' });
-    const prod = await Product.create({ name, price: p, unit });
-    res.json({ id: prod._id, name: prod.name, price: prod.price, unit: prod.unit });
+    const prod = await Product.create({ name, price: p, unit, category, image });
+    res.json({ id: prod._id, name: prod.name, price: prod.price, unit: prod.unit, category: prod.category, image: prod.image });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -193,6 +195,22 @@ app.post('/orders', requireAuth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.post('/payments/stripe/checkout_session', async (req, res) => {
+  try {
+    // Mock Stripe session creation
+    // In a real app, this would call the Stripe API
+    // For now, we just return a success URL redirecting to orders page or home
+    // We delay slightly to simulate network request
+    await new Promise(r => setTimeout(r, 1000));
+    
+    // Return a dummy URL that the frontend will redirect to
+    // Since we don't have a real payment success page, we'll redirect to the home page with a success query param
+    res.json({ url: 'http://localhost:3000/?payment=success' });
+  } catch (e) {
+    res.status(500).json({ error: 'Payment simulation failed' });
+  }
+});
+
 async function seed() {
   const countUsers = await User.countDocuments();
   if (countUsers === 0) {
@@ -201,12 +219,12 @@ async function seed() {
   }
   const countProducts = await Product.countDocuments();
   if (countProducts === 0) {
-    await Product.create({ name: 'Organic Carrots', price: 2.99, unit: 'bunch' });
-    await Product.create({ name: 'Free-range Eggs', price: 6.49, unit: 'dozen' });
-    await Product.create({ name: 'Sourdough Bread', price: 5.99, unit: 'loaf' });
-    await Product.create({ name: 'Grass-fed Beef', price: 12.99, unit: 'lb' });
-    await Product.create({ name: 'Wildflower Honey', price: 10.99, unit: 'jar' });
-    await Product.create({ name: 'Fresh Spinach', price: 3.49, unit: 'bag' });
+    await Product.create({ name: 'Organic Carrots', price: 2.99, unit: 'bunch', category: 'vegetables', image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=800&q=80' });
+    await Product.create({ name: 'Free-range Eggs', price: 6.49, unit: 'dozen', category: 'dairy', image: 'https://images.unsplash.com/photo-1582722878654-02fd235dd7c2?auto=format&fit=crop&w=800&q=80' });
+    await Product.create({ name: 'Sourdough Bread', price: 5.99, unit: 'loaf', category: 'bakery', image: 'https://images.unsplash.com/photo-1585476644321-b976214b606d?auto=format&fit=crop&w=800&q=80' });
+    await Product.create({ name: 'Grass-fed Beef', price: 12.99, unit: 'lb', category: 'meat', image: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=800&q=80' });
+    await Product.create({ name: 'Wildflower Honey', price: 10.99, unit: 'jar', category: 'pantry', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80' });
+    await Product.create({ name: 'Fresh Spinach', price: 3.49, unit: 'bag', category: 'vegetables', image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80' });
   }
 }
 
